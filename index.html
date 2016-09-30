@@ -14,26 +14,41 @@
 </head>
 
 <body>
-  <nav>
-    <div class="input-group">
-      <span class="input-group-addon" id="search-addon">
-        <span class="glyphicon glyphicon-search"></span>
-      </span>
-      <input class="form-control" data-bind="textInput: searchTerm" aria-describedby="search-addon"/>
+  <nav data-bind="css: { 'nav-visible': showNav }">
+    <div data-bind="ifnot: error" class="places-list">
+      <div class="input-group">
+        <span class="input-group-addon" id="search-addon">
+          <span class="glyphicon glyphicon-search"></span>
+        </span>
+        <input class="form-control" data-bind="textInput: searchTerm" aria-describedby="search-addon"/>
+      </div>
+      <div class="list-group" data-bind="foreach: places">
+        <a href="#" class="list-group-item" data-bind="text: $data.venue.name,
+                       css: { active: $data == $root.chosenPlace() },
+                       click: $root.selectPlace"></a>
+      </div>
     </div>
 
-    <div class="list-group" data-bind="foreach: places">
-      <a href="#" class="list-group-item" data-bind="text: $data.name,
-                     css: { active: $data == $root.chosenPlace() },
-                     click: $root.selectPlace"></a>
+    <div class="nav-control btn btn-default" data-bind="click: toggleNav">
+      <div data-bind="ifnot: showNav">
+        <span class="glyphicon glyphicon-chevron-right" ></span>
+      </div>
+      <div data-bind="if: showNav">
+        <span class="glyphicon glyphicon-chevron-left" ></span>
+      </div>
+    </div>
+
+    <div class="error" data-bind="if: error">
+      <span data-bind="text: error"/>
     </div>
   </nav>
-  <div class="map">
-
-  </div>
+  <div id="map" class="map"></div>
 
   <script src="vendor/knockout/knockout-3.4.0.js"></script>
+  <script src="vendor/jquery/jquery-3.1.1.min.js"></script>
 	<script src="js/app.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBB25gnmmWcgADa76Hl-wMZHBDr5c3w4HQ&callback=initMap"
+    type="text/javascript"></script>
 </body>
 
 </html>
