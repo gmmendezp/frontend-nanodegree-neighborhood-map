@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0">
+
+  <title>My portfolio</title>
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:300,500">
+  <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+
+<body>
+  <nav>
+    <div class="input-group">
+      <span class="input-group-addon" id="search-addon">
+        <span class="glyphicon glyphicon-search"></span>
+      </span>
+      <input class="form-control" data-bind="textInput: searchTerm" aria-describedby="search-addon"/>
+    </div>
+
+    <div class="list-group" data-bind="foreach: places">
+      <a href="#" class="list-group-item" data-bind="text: $data.name,
+                     css: { active: $data == $root.chosenPlace() },
+                     click: $root.selectPlace"></a>
+    </div>
+  </nav>
+  <div class="map">
+
+  </div>
+
+  <script src="vendor/knockout/knockout-3.4.0.js"></script>
+	<script src="js/app.js"></script>
+</body>
+
+</html>
