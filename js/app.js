@@ -3,7 +3,7 @@ var config = {
     lat: 46.9487991,
     lng: 7.4473715
   },
-  mapZoom: 15,
+  mapZoom: 16,
   foursquareClientId: '3Y0A1BQI1KGNCALQWUXQH4AGHXLUDOQKIMD0VANL0D5HPPZC',
   foursquareClientSecret: 'XNXWRZBHGVGKMDNLPVXZC0I3PSNEO041WAGAMVQ0OBG3J2EV',
   foursquareAPIUrl: 'https://api.foursquare.com/v2/',
@@ -13,7 +13,6 @@ var config = {
 
 var map;
 var filteredPlaces = [];
-var model = null;
 
 var getPlaces = function (callback) {
   $.get({
@@ -27,7 +26,9 @@ var getPlaces = function (callback) {
       locale: 'en'
     },
     success: function (data) {
-      callback(null, data.response.groups[0].items)
+      callback(null, data.response.groups[0].items.map(function (item) {
+        return item.venue;
+      }));
     },
     error: function (error) {
       callback('There was a problem loading FourSquare places, reload the page to try again.');
@@ -37,7 +38,7 @@ var getPlaces = function (callback) {
 };
 
 var initModel = function (error, places) {
-  if(error) {
+  if (error) {
     places = [];
   }
   filteredPlaces = places.slice(0);
@@ -48,8 +49,8 @@ var initModel = function (error, places) {
     // function to select a place, changes the selectedPlace and toggles the marker
     var selectPlace = function () {
       var currentPlace = self.selectedPlace();
-      if(currentPlace !== this) {
-        if(currentPlace) {
+      if (currentPlace !== this) {
+        if (currentPlace) {
           currentPlace.marker.setAnimation(null);
         }
         self.selectedPlace(this);
@@ -62,15 +63,15 @@ var initModel = function (error, places) {
 
     // Initializes the markers and adds the click handler
     var setMarkers = function () {
-      if(map && filteredPlaces.length > 0) {
-        filteredPlaces.forEach(function(place) {
+      if (map && filteredPlaces.length > 0) {
+        filteredPlaces.forEach(function (place) {
           place.marker = new google.maps.Marker({
             map: map,
             position: {
-              lat: place.venue.location.lat,
-              lng: place.venue.location.lng
+              lat: place.location.lat,
+              lng: place.location.lng
             },
-            title: place.venue.name
+            title: place.name
           });
           place.marker.addListener('click', selectPlace.bind(place));
         })
@@ -87,10 +88,10 @@ var initModel = function (error, places) {
     self.searchTerm = ko.observable('');
     self.places = ko.computed(function () {
       filteredPlaces = places.filter(function (place) {
-        return place.venue.name.toUpperCase().indexOf(self.searchTerm().toUpperCase()) > -1;
+        return place.name.toUpperCase().indexOf(self.searchTerm().toUpperCase()) > -1;
       });
       places.forEach(function (place) {
-        if(place.venue.name.toUpperCase().indexOf(self.searchTerm().toUpperCase()) > -1) {
+        if (place.name.toUpperCase().indexOf(self.searchTerm().toUpperCase()) > -1) {
           place.marker.setMap(map);
         } else {
           place.marker.setMap(null);

@@ -23,7 +23,7 @@
         <input class="form-control" data-bind="textInput: searchTerm" aria-describedby="search-addon"/>
       </div>
       <div class="list-group" data-bind="foreach: places">
-        <a href="#" class="list-group-item" data-bind="text: $data.venue.name,
+        <a href="#" class="list-group-item" data-bind="text: $data.name,
                        css: { active: $data === $root.selectedPlace() },
                        click: $root.selectPlace"></a>
       </div>
