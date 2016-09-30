@@ -24,7 +24,7 @@
       </div>
       <div class="list-group" data-bind="foreach: places">
         <a href="#" class="list-group-item" data-bind="text: $data.venue.name,
-                       css: { active: $data == $root.chosenPlace() },
+                       css: { active: $data === $root.selectedPlace() },
                        click: $root.selectPlace"></a>
       </div>
     </div>
