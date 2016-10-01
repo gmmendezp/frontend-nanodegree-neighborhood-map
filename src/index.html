@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:300,500">
   <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
   <link rel="stylesheet" href="css/app.css">
+  <link rel="shortcut icon" type="image/png" href="assets/favicon.png">
 </head>
 
 <body>
@@ -20,7 +21,7 @@
         <span class="input-group-addon" id="search-addon">
           <span class="glyphicon glyphicon-search"></span>
         </span>
-        <input class="form-control" data-bind="textInput: searchTerm" aria-describedby="search-addon"/>
+        <input class="form-control" data-bind="textInput: searchTerm" aria-describedby="search-addon">
       </div>
       <div class="list-group" data-bind="foreach: places">
         <a href="#" class="list-group-item" data-bind="text: $data.name,
@@ -37,17 +38,16 @@
         <span class="glyphicon glyphicon-chevron-left" ></span>
       </div>
     </div>
-
-    <div class="error" data-bind="if: error">
-      <span data-bind="text: error"></span>
-    </div>
   </nav>
-  <div id="map" class="map"></div>
+  <div class="error places-error" data-bind="if: error">
+    <span data-bind="text: error"></span>
+  </div>
+  <main id="map" class="map"></main>
 
   <script src="vendor/knockout/knockout-3.4.0.js"></script>
   <script src="vendor/jquery/jquery-3.1.1.min.js"></script>
 	<script src="js/app.js"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBB25gnmmWcgADa76Hl-wMZHBDr5c3w4HQ&callback=initMap"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBB25gnmmWcgADa76Hl-wMZHBDr5c3w4HQ&callback=initMap" onerror="mapLoadingError()"></script>
 </body>
 
 </html>

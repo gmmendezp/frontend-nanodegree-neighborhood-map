@@ -102,3 +102,11 @@ nav {
 .error {
   color: red;
 }
+.places-error,
+.map-error {
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  padding: 5px 50px;
+  background-color: white;
+}

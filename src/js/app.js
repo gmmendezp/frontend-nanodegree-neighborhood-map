@@ -1,3 +1,5 @@
+
+'use strict';
 /*
 * Configuration options
 */
@@ -38,6 +40,10 @@ $(function () {
 * Variable containing the map
 */
 var map;
+/*
+* Variable containing the info window
+*/
+var infoWindow;
 
 /**
 * @description Gets recommended places from Foursquare
@@ -62,7 +68,7 @@ var getPlaces = function (callback) {
     error: function (error) {
       callback('There was a problem loading FourSquare places, ' +
                'reload the page to try again.');
-      console.error(error, []);
+      console.error(error);
     }
   });
 };
@@ -97,7 +103,7 @@ var getVenueInfo = function(place, callback) {
 * @param {object} placeInfo - info retrieved from foursquare API
 * @returns {string} Template filled with place's info
 */
-var applyINFO_TEMPLATE = function (placeInfo) {
+var applyInfoTemplate = function (placeInfo) {
   var template = CONFIG.INFO_TEMPLATE;
   var photo = placeInfo.bestPhoto;
   template = template.split('{{photo}}').join(
@@ -132,11 +138,10 @@ var applyINFO_TEMPLATE = function (placeInfo) {
 * @param {object} placeInfo - info retrieved from foursquare API
 */
 var openInfoWindow = function (error, place, placeInfo) {
-  var infoWindow = place.infoWindow;
   if (error) {
     infoWindow.setContent(CONFIG.ERROR_TEMPLATE.replace('{{error}}', error));
   } else {
-    infoWindow.setContent(applyINFO_TEMPLATE(placeInfo));
+    infoWindow.setContent(applyInfoTemplate(placeInfo));
   }
   infoWindow.open(map, place.marker);
 };
@@ -147,6 +152,9 @@ var openInfoWindow = function (error, place, placeInfo) {
 * @param {array} places - an array of places
 */
 var initModel = function (error, places) {
+  if (error) {
+    places = [];
+  }
   /**
   * @description knockout model
   */
@@ -161,15 +169,16 @@ var initModel = function (error, places) {
       if (currentPlace !== this) {
         if (currentPlace) {
           currentPlace.marker.setAnimation(null);
-          currentPlace.infoWindow.close(map, this.marker);
+          infoWindow.close(map, this.marker);
         }
         self.selectedPlace(this);
         this.marker.setAnimation(google.maps.Animation.BOUNCE);
+        map.panTo(this.marker.getPosition());
         getVenueInfo(this, openInfoWindow);
       } else {
         self.selectedPlace(null);
         this.marker.setAnimation(null);
-        this.infoWindow.close(map, this.marker);
+        infoWindow.close(map, this.marker);
       }
     };
 
@@ -188,7 +197,6 @@ var initModel = function (error, places) {
             title: place.name
           });
           place.marker.addListener('click', selectPlace.bind(place));
-          place.infoWindow = new google.maps.InfoWindow();
         });
       }
     };
@@ -208,14 +216,10 @@ var initModel = function (error, places) {
                          .indexOf(self.searchTerm().toUpperCase()) > -1;
       });
       places.forEach(function (place) {
-        place.infoWindow.close(map, place.marker);
+        infoWindow.close(map, place.marker);
         var showPlace = place.name.toUpperCase()
                                 .indexOf(self.searchTerm().toUpperCase()) > -1;
-        if (showPlace) {
-          place.marker.setMap(map);
-        } else {
-          place.marker.setMap(null);
-        }
+        place.marker.setVisible(showPlace);
       });
       return filteredPlaces;
     }, this);
@@ -239,5 +243,13 @@ var initMap = function () {
       position: google.maps.ControlPosition.TOP_RIGHT
     }
   });
+  infoWindow = new google.maps.InfoWindow();
   getPlaces(initModel);
+};
+
+/**
+* @description function called as callback for the loading of Google Maps API
+*/
+var mapLoadingError = function () {
+  initModel('There was a problem with the Google Maps API, please try again later.');
 };
