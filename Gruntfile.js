@@ -2,44 +2,126 @@ module.exports = function (grunt) {
 
   grunt.initConfig({
 
-    /* Project server */
-    connect: {
-      server: {
+    /* Clear out the directories if they exists */
+    clean: {
+      dist: {
+        src: ['dist'],
+      }
+    },
+
+    /* Generate the dist directory if it is missing */
+    mkdir: {
+      dist: {
         options: {
-          port: '8000',
-          livereload: true,
-          hostname: 'localhost',
-          middleware: function (connect, options, middleware) {
-            middleware.unshift(require('connect-livereload')());
-            return middleware;
-          }
+          create: ['dist']
+        },
+      },
+    },
+
+    /* Copy the files to dist folder */
+    copy: {
+      dist: {
+        files: [{
+          expand: true,
+          cwd: 'src',
+          src: [
+            'vendor/*',
+            'vendor/*/*',
+            'vendor/*/*/*',
+            'assets/*'],
+          dest: 'dist'
+        }]
+      }
+    },
+
+    /* Minify JS files */
+    uglify: {
+      dist: {
+        files: {
+          'dist/js/app.js': ['src/js/app.js'],
         }
       }
     },
 
-    /* Live reload server */
-    watch: {
-      options:{
-        livereload: true
+    /* Minify CSS files */
+    cssmin: {
+      dist: {
+        files: [{
+          expand: true,
+          cwd: 'src/css',
+          src: ['*.css'],
+          dest: 'dist/css',
+          ext: '.css'
+        }]
+      }
+    },
+
+    /* Minify HTML files */
+    htmlmin: {
+      dist: {
+        options: {
+          removeComments: true,
+          collapseWhitespace: true
+        },
+        files: {
+          'dist/index.html': 'src/index.html',
+          'dist/info.html': 'src/info.html',
+        }
+      }
+    },
+
+    /* Project server */
+    connect: {
+      dist: {
+        options: {
+          port: '8000',
+          hostname: 'localhost',
+          keepalive: true,
+          base: 'dist'
+        }
       },
-      server: {
-        files: [
-          'css/*.css',
-          'js/*.js',
-          '*.html',
-          'Gruntfile.js',
-          'img/*'
-        ]
+      src: {
+        options: {
+          port: '8000',
+          hostname: 'localhost',
+          keepalive: true,
+          base: 'src'
+        }
       }
     }
   });
 
-  /* Create the `serve` task */
+  /* Create the `build` task */
+  grunt.registerTask('build',[
+    'clean',
+    'mkdir',
+    'copy',
+    'uglify',
+    'cssmin',
+    'htmlmin'
+  ]);
+
+  /* Create the `server` task */
   grunt.registerTask('server',[
-    'connect',
-    'watch'
+    'clean',
+    'mkdir',
+    'copy',
+    'uglify',
+    'cssmin',
+    'htmlmin',
+    'connect:dist'
+  ]);
+  /* Create the `dev` task */
+  grunt.registerTask('dev',[
+    'connect'
   ]);
 
   grunt.loadNpmTasks('grunt-contrib-connect');
-  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-contrib-htmlmin');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-inline');
+  grunt.loadNpmTasks('grunt-mkdir');
 };

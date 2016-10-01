@@ -16,3 +16,9 @@ You will develop a single page application featuring a map of your neighborhood 
 3. Execute `npm install` and wait for it to finish.
 3. Execute `grunt server`
 4. Navigate to [http://localhost:8000](http://localhost:8000) in your browser.
+
+##  API usage
+
+This project makes usage of the following API to retrieve information:
+  * Google Maps
+  * Foursquare

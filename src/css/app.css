@@ -1,7 +1,10 @@
 html,
 body {
   height: 100%;
+  font-family: "Raleway", sans-serif;
 }
+
+/* Navbar */
 nav {
   z-index: 1;
   background-color: white;
@@ -12,9 +15,11 @@ nav {
   position: fixed;
   left: -300px;
 }
+
 .nav-visible {
   left: 0;
 }
+
 .nav-control {
   position: absolute;
   top: 5px;
@@ -23,6 +28,7 @@ nav {
   width: 40px;
   border: 1px solid #ddd;
 }
+
 @media screen and (max-width: 400px) {
   nav {
     width: 200px;
@@ -31,51 +37,68 @@ nav {
     left: 200px;
   }
 }
+
 .places-list {
   height: 100%;
 }
+
 .list-group {
   max-height: 100%;
   overflow: auto;
 }
+
 .input-group {
   margin-bottom: 5px;
 }
+
+/* Map container */
 .map {
   z-index: 0;
   height: 100%;
   width: 100%;
 }
+
+/* Info Window */
 .gm-style-iw + div {
   display: none;
 }
+
 .gm-style img {
   max-width: 100%;
 }
+
 .place {
   width: 600px;
   max-width: 100%;
 }
+
 .place-img {
   margin: 0 auto;
 }
+
 .categories,
 .tags {
   font-size: 0.9em;
 }
+
 .tags {
   margin-bottom: 1em;
 }
+
 .categories-title,
 .tags-title {
   font-weight: bold;
 }
+
 .place-title {
   margin-bottom: 0.1em;
 }
-.error {
-  color: red;
-}
+
 .foursquare {
   margin-top: 0.8em;
+}
+
+/* Utils */
+.error {
+  color: red;
 }

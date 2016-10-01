@@ -1,46 +1,56 @@
-// Configuration options
-var config = {
-  mapCenter: {
+/*
+* Configuration options
+*/
+var CONFIG = {
+  MAP_CENTER: {
     lat: 46.9487991,
     lng: 7.4473715
   },
-  mapZoom: 16,
-  foursquareClientId: '3Y0A1BQI1KGNCALQWUXQH4AGHXLUDOQKIMD0VANL0D5HPPZC',
-  foursquareClientSecret: 'XNXWRZBHGVGKMDNLPVXZC0I3PSNEO041WAGAMVQ0OBG3J2EV',
-  foursquareAPIUrl: 'https://api.foursquare.com/v2/venues/',
-  foursquareExplore: 'explore',
-  maxPlaces: 20,
-  errorTemplate: '<div class="error">{{error}}</div>',
-  infoTemplate: ''
+  MAP_ZOOM: 16,
+  FOURSQUARE_CLIENT_ID: '3Y0A1BQI1KGNCALQWUXQH4AGHXLUDOQKIMD0VANL0D5HPPZC',
+  FOURSQUARE_CLIENT_SECRET: 'XNXWRZBHGVGKMDNLPVXZC0I3PSNEO041WAGAMVQ0OBG3J2EV',
+  FOURSQUARE_API_URL: 'https://api.foursquare.com/v2/venues/',
+  FOURSQUARE_EXPLORE: 'explore',
+  MAX_PLACES: 20,
+  ERROR_TEMPLATE: '<div class="error">{{error}}</div>',
+  INFO_TEMPLATE: ''
 };
 
+/*
+* Gets the template from the info.html file asap
+*/
 $(function () {
   $.get({
     url: '/info.html',
     success : function (result) {
-      config.infoTemplate = result
+      CONFIG.INFO_TEMPLATE = result;
     },
     error: function() {
-      config.infoTemplate = config.errorTemplate.replace(
+      CONFIG.INFO_TEMPLATE = CONFIG.ERROR_TEMPLATE.replace(
         '{{error}}',
-        'There was a problem retrieven a file, please refresh the page.'
+        'There was a problem retrieving a file, please refresh the page.'
       );
     }
   });
 });
 
-// variable that contains the map
+/*
+* Variable containing the map
+*/
 var map;
 
-// Get recommended places from foursquare
+/**
+* @description Gets recommended places from Foursquare
+* @param {function} callback - function to call after the places are retrieved
+*/
 var getPlaces = function (callback) {
   $.get({
-    url: config.foursquareAPIUrl + config.foursquareExplore,
+    url: CONFIG.FOURSQUARE_API_URL + CONFIG.FOURSQUARE_EXPLORE,
     data: {
-      ll: config.mapCenter.lat + ',' + config.mapCenter.lng,
-      limit: config.maxPlaces,
-      client_id: config.foursquareClientId,
-      client_secret: config.foursquareClientSecret,
+      ll: CONFIG.MAP_CENTER.lat + ',' + CONFIG.MAP_CENTER.lng,
+      limit: CONFIG.MAX_PLACES,
+      client_id: CONFIG.FOURSQUARE_CLIENT_ID,
+      client_secret: CONFIG.FOURSQUARE_CLIENT_SECRET,
       v: 20160930,
       locale: 'en'
     },
@@ -52,18 +62,22 @@ var getPlaces = function (callback) {
     error: function (error) {
       callback('There was a problem loading FourSquare places, ' +
                'reload the page to try again.');
-      console.error(error);
+      console.error(error, []);
     }
   });
 };
 
-// Get info about the selected place from foursquare
+/**
+* @description Get info about the selected place from foursquare
+* @param {object} place - place from which it requests info
+* @param {function} callback - function to call after the info is retrieved
+*/
 var getVenueInfo = function(place, callback) {
   $.get({
-    url: config.foursquareAPIUrl + place.id,
+    url: CONFIG.FOURSQUARE_API_URL + place.id,
     data: {
-      client_id: config.foursquareClientId,
-      client_secret: config.foursquareClientSecret,
+      client_id: CONFIG.FOURSQUARE_CLIENT_ID,
+      client_secret: CONFIG.FOURSQUARE_CLIENT_SECRET,
       v: 20160930,
       locale: 'en'
     },
@@ -78,9 +92,13 @@ var getVenueInfo = function(place, callback) {
   });
 };
 
-var applyInfoTemplate = function (placeInfo) {
-  console.log(placeInfo)
-  var template = config.infoTemplate;
+/**
+* @description Fill the info window template with the place's info
+* @param {object} placeInfo - info retrieved from foursquare API
+* @returns {string} Template filled with place's info
+*/
+var applyINFO_TEMPLATE = function (placeInfo) {
+  var template = CONFIG.INFO_TEMPLATE;
   var photo = placeInfo.bestPhoto;
   template = template.split('{{photo}}').join(
     photo.prefix + 'cap200' + photo.suffix
@@ -88,7 +106,7 @@ var applyInfoTemplate = function (placeInfo) {
   template = template.split('{{name}}').join(placeInfo.name);
   template = template.split('{{fsUrl}}').join(placeInfo.shortUrl);
   var categories = placeInfo.categories.map(function (cat) {
-    return cat.name
+    return cat.name;
   });
   template = template.split('{{categories}}').join(
     categories.length ? categories.join(', ') : 'No categories'
@@ -107,28 +125,37 @@ var applyInfoTemplate = function (placeInfo) {
   return template;
 };
 
-// Fill the info window and open it with info from a place
+/**
+* @description Decide if showing an error or place info, opens the info window
+* @param {string} error - if a error happened before it comes with a message
+* @param {object} place - it is the place object as saved in the knockout model
+* @param {object} placeInfo - info retrieved from foursquare API
+*/
 var openInfoWindow = function (error, place, placeInfo) {
   var infoWindow = place.infoWindow;
   if (error) {
-    infoWindow.setContent(config.errorTemplate.replace('{{error}}', error));
+    infoWindow.setContent(CONFIG.ERROR_TEMPLATE.replace('{{error}}', error));
   } else {
-    infoWindow.setContent(applyInfoTemplate(placeInfo));
+    infoWindow.setContent(applyINFO_TEMPLATE(placeInfo));
   }
   infoWindow.open(map, place.marker);
 };
 
-// Initialize knockout model
+/**
+* @description Initializes knockout model
+* @param {string} error - if a error happened before it comes with a message
+* @param {array} places - an array of places
+*/
 var initModel = function (error, places) {
-  if (error) {
-    places = [];
-  }
-  var filteredPlaces = places.slice(0);
-
+  /**
+  * @description knockout model
+  */
   var ViewModel = function () {
     var self = this;
 
-    // function to select a place, changes selectedPlace and toggles the marker
+    /**
+    * @description changes selectedPlace and toggles the marker/info-window
+    */
     var selectPlace = function () {
       var currentPlace = self.selectedPlace();
       if (currentPlace !== this) {
@@ -146,10 +173,12 @@ var initModel = function (error, places) {
       }
     };
 
-    // Initializes the markers and adds the click handler
-    var setMarkersAndInfo = function () {
-      if (map && filteredPlaces.length > 0) {
-        filteredPlaces.forEach(function (place) {
+    /**
+    * @description Initializes the markers and adds the click handler
+    */
+    var setMarkersAndInfo = function (places) {
+      if (map && places.length > 0) {
+        places.forEach(function (place) {
           place.marker = new google.maps.Marker({
             map: map,
             position: {
@@ -163,7 +192,7 @@ var initModel = function (error, places) {
         });
       }
     };
-    setMarkersAndInfo();
+    setMarkersAndInfo(places);
 
     // Properties initialization
     self.showNav = ko.observable(false);
@@ -171,13 +200,15 @@ var initModel = function (error, places) {
       self.showNav(!self.showNav());
     };
     self.error = error;
+    self.selectedPlace = ko.observable();
     self.searchTerm = ko.observable('');
     self.places = ko.computed(function () {
-      filteredPlaces = places.filter(function (place) {
+      var filteredPlaces = places.filter(function (place) {
         return place.name.toUpperCase()
                          .indexOf(self.searchTerm().toUpperCase()) > -1;
       });
       places.forEach(function (place) {
+        place.infoWindow.close(map, place.marker);
         var showPlace = place.name.toUpperCase()
                                 .indexOf(self.searchTerm().toUpperCase()) > -1;
         if (showPlace) {
@@ -188,19 +219,21 @@ var initModel = function (error, places) {
       });
       return filteredPlaces;
     }, this);
-    self.selectedPlace = ko.observable();
     self.selectPlace = function (place) {
       selectPlace.call(place);
-    }
+    };
   };
 
   ko.applyBindings(new ViewModel());
 };
 
+/**
+* @description function called as callback for the loading of Google Maps API
+*/
 var initMap = function () {
   map = new google.maps.Map(document.getElementById('map'), {
-    center: config.mapCenter,
-    zoom: config.mapZoom,
+    center: CONFIG.MAP_CENTER,
+    zoom: CONFIG.MAP_ZOOM,
     clickableIcons: false,
     mapTypeControlOptions: {
       position: google.maps.ControlPosition.TOP_RIGHT
