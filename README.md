@@ -12,8 +12,8 @@ You will develop a single page application featuring a map of your neighborhood 
 ##  API usage
 
 This project makes usage of the following API to retrieve information:
-  * Google Maps
-  * Foursquare
+* Google Maps
+* Foursquare
 
 ## Steps to run
 
