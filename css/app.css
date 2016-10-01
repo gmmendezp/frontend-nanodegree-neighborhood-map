@@ -46,6 +46,36 @@ nav {
   height: 100%;
   width: 100%;
 }
+.gm-style-iw + div {
+  display: none;
+}
+.gm-style img {
+  max-width: 100%;
+}
+.place {
+  width: 600px;
+  max-width: 100%;
+}
+.place-img {
+  margin: 0 auto;
+}
+.categories,
+.tags {
+  font-size: 0.9em;
+}
+.tags {
+  margin-bottom: 1em;
+}
+.categories-title,
+.tags-title {
+  font-weight: bold;
+}
+.place-title {
+  margin-bottom: 0.1em;
+}
 .error {
   color: red;
+}
+.foursquare {
+  margin-top: 0.8em;
 }
