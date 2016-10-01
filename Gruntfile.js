@@ -113,7 +113,7 @@ module.exports = function (grunt) {
   ]);
   /* Create the `dev` task */
   grunt.registerTask('dev',[
-    'connect'
+    'connect:src'
   ]);
 
   grunt.loadNpmTasks('grunt-contrib-connect');
