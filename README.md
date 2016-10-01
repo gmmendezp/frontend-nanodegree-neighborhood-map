@@ -9,6 +9,12 @@ You will develop a single page application featuring a map of your neighborhood 
 * [npm](https://www.npmjs.com/)
 * [grunt-cli](https://github.com/gruntjs/grunt-cli)
 
+##  API usage
+
+This project makes usage of the following API to retrieve information:
+  * Google Maps
+  * Foursquare
+
 ## Steps to run
 
 1. Clone the repository by downloading the zip file or using `git clone`.
@@ -17,8 +23,8 @@ You will develop a single page application featuring a map of your neighborhood 
 3. Execute `grunt server`
 4. Navigate to [http://localhost:8000](http://localhost:8000) in your browser.
 
-##  API usage
+## Grunt tasks
 
-This project makes usage of the following API to retrieve information:
-  * Google Maps
-  * Foursquare
+* Execute `grunt build` to generate the dist folder
+* Execute `grunt server` to generate the dist folder and create a server from it
+* Execute `grunt dev` to run a server in the src folder
