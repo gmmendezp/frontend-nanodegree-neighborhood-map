@@ -39,8 +39,10 @@
       </div>
     </div>
   </nav>
-  <div class="error places-error" data-bind="if: error">
-    <span data-bind="text: error"></span>
+  <div data-bind="if: error">
+    <div class="error places-error">
+      <span data-bind="text: error"></span>
+    </div>
   </div>
   <main id="map" class="map"></main>
 
